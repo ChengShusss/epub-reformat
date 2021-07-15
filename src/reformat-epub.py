@@ -1,8 +1,9 @@
-#!/usr/bin/python3
+#!python
 # -*- coding: utf-8 -*-
 
 import re
 import os
+import zipfile
 
 p_prefix = "<p class=\"calibre1\">"
 p_suffix = "</p>"
@@ -107,10 +108,21 @@ def main():
 
 
 def test():
-    src = "epub-reformat/src/"
-    print(get_Html_List(src))
+    # with zipfile.ZipFile("data/src.epub", 'r') as myzip:
+    #     if not os.path.exists("data"):
+    #         os.mkdir("data")
+    #     if not os.path.exists("data/src"):
+    #         os.mkdir("data/src")
+    #     res = myzip.extractall("data/src/")
+    #     print("Excart file into data/src")
+
+    with zipfile.ZipFile('data/dst.epub', 'w') as target:
+        for i in os.walk("data/src", topdown=False):
+            for n in i[2]:
+                print(os.path.normpath(''.join((i[0], "/", n))))
+    pass
 
 
 if __name__ == "__main__":
-    main()
-    # test()
+    # main()
+    test()
