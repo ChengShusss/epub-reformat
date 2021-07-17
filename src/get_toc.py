@@ -1,54 +1,28 @@
-#!python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-import re
-import os
-
-def get_toc(lines):
-    index = 0
-    count = 1
-    toc = []
-
-    while index < len(lines):
-        if "<text>" in lines[index]:
-            print(lines[index])
-            res = re.search('<text>.+</text>', lines[index])
-            if not res:
-                continue
-            t = res.group()[6:-7]
-            index += 2
-            res = re.search('".+"', lines[index])
-            if not res:
-                continue
-            src = res.group()[1:-1]
-            title = [t, src]
-            toc.append(title)
-            count += 1
-        index += 1
-    
-    return title
-
-def load(src):
-    lines = None
-
-    print(f"INFO - load file [{src}]")
-    with open(src, 'r',encoding='utf-8') as f:
-        lines = f.readlines()
-    print(f"  Total {len(lines)} lines")
-    
-    return lines
+import json
+from bs4 import BeautifulSoup
+from bs4.dammit import EntitySubstitution
 
 def main():
-    lines = load("data/src/toc.ncx")
-    
-    for line in lines[0: 50]:
-        print(line)
+    with open("data/src/toc.ncx", 'r') as f:
+        soup = BeautifulSoup(f, "html.parser")
+        ncx = soup.findChildren(name='navpoint')
 
+        dic = []
+        for item in ncx:
+            text = ""
+            src = ""
+            for s in item.children:
+                if s.name == "navlabel":
+                    text = s.text.strip()
+                elif s.name == "content":
+                    src = s.attrs['src']
+            dic.append([text, src])
 
-    # toc = get_toc(lines)
-
-    # for title in toc:
-    #     print(title)
+        with open("data/toc.json", 'w', encoding='utf-8') as w:
+            json.dump(dic, w, ensure_ascii=False)
 
 
 if __name__ == "__main__":
