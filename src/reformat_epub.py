@@ -59,6 +59,12 @@ def is_toc_prefix(toc, line):
     return (False, False, title)
 
 
+def delete_ad(lines, ad_string):
+    for line in lines:
+        if line.string == ad_string:
+            line.decompose()
+
+
 def handle_lines(lines):
     # re-format lines, merget splited lines into one line.
     index = 0
@@ -103,7 +109,7 @@ def handle_lines(lines):
             continue
 
         # merge splited normal lines
-        if (25< len(line)):
+        if (25 < len(line)):
             
             if not paragraph[0]:
                 paragraph[0] = index
@@ -138,6 +144,11 @@ def handle_document(file):
     # load file, get root and body
     (soup, lines) = load_document(file, "body")
 
+    # define ad string
+    ad_string = "更多电子书资料请搜索「书行天下」：http://www.sxpdf.com"
+    delete_ad(lines, ad_string)
+
+    # merge splited lines
     handle_lines(lines)
 
     for line in lines:
@@ -184,6 +195,11 @@ def main():
     # packaging target dir into epub file.
     creat_epub("data/src", "data/dst.epub", "data/src/", log=False)
     print("Create target File.")
+
+def test():
+    file = "data/src/index_split_000.html"
+    (soup, lines) = load_document(file, "body")
+    delete_ad(lines)
 
 
 if __name__ == "__main__":
